@@ -32,6 +32,9 @@ object GitterTwitterBot extends LazyLogging {
   private def trim140(text: String): String =
     if (text.size <= 140) text else text.slice(0, 137) + "..."
 
+  private def escapeAtmark(text: String): String =
+    text.replace("@", ">")
+
   private def tweet(gitterMessage: GitterMessage): Unit = {
     import twitter4j._
     import twitter4j.conf._
@@ -48,7 +51,7 @@ object GitterTwitterBot extends LazyLogging {
     logger.info(message)
     val trimmedMessage = trim140(message)
     try {
-      twitter.updateStatus(trimmedMessage)
+      twitter.updateStatus(escapeAtmark(trimmedMessage))
     } catch {
       case e: TwitterException => logger.error(e.getMessage)
     }
