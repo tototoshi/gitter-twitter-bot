@@ -1,4 +1,4 @@
-# Gitt5er Twitter Bot
+# Gitter Twitter Bot
 
 ```
 $ sbt -Dgitter.roomId=xxxxxxxxxxxxxxxxxxxxxxxxxx \
