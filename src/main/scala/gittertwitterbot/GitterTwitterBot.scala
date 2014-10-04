@@ -47,7 +47,11 @@ object GitterTwitterBot extends LazyLogging {
     val message = gitterMessage.fromUser.username + ": " + gitterMessage.text
     logger.info(message)
     val trimmedMessage = trim140(message)
-    twitter.updateStatus(trimmedMessage)
+    try {
+      twitter.updateStatus(trimmedMessage)
+    } catch {
+      case e: TwitterException => logger.error(e.getMessage)
+    }
   }
 
   def main(args: Array[String]): Unit = {
