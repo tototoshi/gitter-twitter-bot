@@ -1,3 +1,7 @@
+import AssemblyKeys._
+
+assemblySettings
+
 name := """gitter-twitter-bot"""
 
 version := "1.0"
