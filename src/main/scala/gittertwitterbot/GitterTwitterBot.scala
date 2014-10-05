@@ -2,7 +2,7 @@ package gittertwitterbot
 
 import com.typesafe.scalalogging.LazyLogging
 
-object GitterTwitterBot extends LazyLogging {
+object GitterTwitterBot extends LazyLogging with Using {
 
   import com.github.kxbmap.configs._
   import com.typesafe.config.ConfigFactory
@@ -11,6 +11,7 @@ object GitterTwitterBot extends LazyLogging {
 
   private val gitterRoomId = config.get[String]("gitter.roomId")
   private val gitterToken = config.get[String]("gitter.token")
+  private val gistToken = config.get[String]("github.token")
   private val twitterConsumerKey = config.get[String]("twitter.consumerKey")
   private val twitterConsumerSecret = config.get[String]("twitter.consumerSecret")
   private val twitterAccessToken = config.get[String]("twitter.accessToken")
@@ -22,9 +23,6 @@ object GitterTwitterBot extends LazyLogging {
     twitterAccessToken,
     twitterAccessTokenSecret
   )
-
-  private def using[A, R <: { def close() }](r : R)(f : R => A) : A =
-    try { f(r) } finally { r.close() }
 
   private def parseStreamLine(line: String): Option[GitterMessage] = {
     import org.json4s._
@@ -42,6 +40,8 @@ object GitterTwitterBot extends LazyLogging {
     val connectionTimeout = 60 * 1000
     val readTimeout = 60 * 1000
 
+    val gist = new Gist(gistToken)
+
     Http(url)
       .header("Accept", "application/json")
       .header("Authorization", s"Bearer $gitterToken")
@@ -54,7 +54,7 @@ object GitterTwitterBot extends LazyLogging {
             line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
             gitterMessage <- parseStreamLine(line)
           } {
-            twitter.tweet(gitterMessage)
+            twitter.tweet(gitterMessage, gist)
           }
         }
       }

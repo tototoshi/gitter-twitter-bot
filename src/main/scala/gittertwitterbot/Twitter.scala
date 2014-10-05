@@ -20,20 +20,26 @@ class Twitter (
     .build
   private val twitter = new TwitterFactory(twitter4jConf).getInstance()
 
-  private def trim140(text: String): String =
-    if (text.size <= 140) text else text.slice(0, 137) + "..."
+  private def trim(n: Int)(text: String): String =
+    if (text.size <= n) text else text.slice(0, n - 3) + "..."
 
   private def escapeAtmark(text: String): String =
     text.replace("@", ">")
 
-  def tweet(gitterMessage: GitterMessage): Unit = {
-    val message = gitterMessage.fromUser.username + ": " + gitterMessage.text
+  def tweet(gitterMessage: GitterMessage, gist: Gist): Unit = {
+    val message = escapeAtmark(gitterMessage.fromUser.username + ":\n" + gitterMessage.text)
     logger.info(message)
-    val trimmedMessage = trim140(message)
     try {
-      twitter.updateStatus(escapeAtmark(trimmedMessage))
+      if (message.size > 140) {
+        val trimmedMessage = trim(70)(message)
+        val url = gist.post(message)
+        twitter.updateStatus(trimmedMessage + " " + url)
+      } else {
+        twitter.updateStatus(message)
+      }
     } catch {
       case e: TwitterException => logger.error(e.getMessage)
     }
+
   }
 }
