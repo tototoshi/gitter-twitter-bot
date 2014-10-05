@@ -16,45 +16,21 @@ object GitterTwitterBot extends LazyLogging {
   private val twitterAccessToken = config.get[String]("twitter.accessToken")
   private val twitterAccessTokenSecret = config.get[String]("twitter.accessTokenSecret")
 
+  private val twitter = new Twitter(
+    twitterConsumerKey,
+    twitterConsumerSecret,
+    twitterAccessToken,
+    twitterAccessTokenSecret
+  )
+
   private def using[A, R <: { def close() }](r : R)(f : R => A) : A =
     try { f(r) } finally { r.close() }
-
-  case class GitterUser(username: String)
-  case class GitterMessage(fromUser: GitterUser, text: String)
 
   private def parseStreamLine(line: String): Option[GitterMessage] = {
     import org.json4s._
     import org.json4s.native.JsonMethods._
     implicit val formats = DefaultFormats
     if (line.trim.isEmpty) None else Some(parse(line).extract[GitterMessage])
-  }
-
-  private def trim140(text: String): String =
-    if (text.size <= 140) text else text.slice(0, 137) + "..."
-
-  private def escapeAtmark(text: String): String =
-    text.replace("@", ">")
-
-  private def tweet(gitterMessage: GitterMessage): Unit = {
-    import twitter4j._
-    import twitter4j.conf._
-    val twitter4jConfBuilder = new ConfigurationBuilder
-    val twitter4jConf = twitter4jConfBuilder
-      .setOAuthConsumerKey(twitterConsumerKey)
-      .setOAuthConsumerSecret(twitterConsumerSecret)
-      .setOAuthAccessToken(twitterAccessToken)
-      .setOAuthAccessTokenSecret(twitterAccessTokenSecret)
-      .build
-
-    val twitter = new TwitterFactory(twitter4jConf).getInstance()
-    val message = gitterMessage.fromUser.username + ": " + gitterMessage.text
-    logger.info(message)
-    val trimmedMessage = trim140(message)
-    try {
-      twitter.updateStatus(escapeAtmark(trimmedMessage))
-    } catch {
-      case e: TwitterException => logger.error(e.getMessage)
-    }
   }
 
   def main(args: Array[String]): Unit = {
@@ -78,7 +54,7 @@ object GitterTwitterBot extends LazyLogging {
             line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
             gitterMessage <- parseStreamLine(line)
           } {
-            tweet(gitterMessage)
+            twitter.tweet(gitterMessage)
           }
         }
       }
