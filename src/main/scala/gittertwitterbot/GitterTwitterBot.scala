@@ -53,6 +53,7 @@ object GitterTwitterBot extends LazyLogging with Using {
           for {
             line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
             gitterMessage <- parseStreamLine(line)
+            if Twitter.isAllowedToTweet(gitterMessage)
           } {
             twitter.tweet(gitterMessage, gist)
           }

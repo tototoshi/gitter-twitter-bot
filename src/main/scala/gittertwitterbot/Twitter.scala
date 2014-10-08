@@ -2,6 +2,15 @@ package gittertwitterbot
 
 import com.typesafe.scalalogging.LazyLogging
 
+object Twitter {
+
+  def isAllowedToTweet(gitterMessage: GitterMessage): Boolean = {
+    val regex = """^.*?(>\s*/dev/null\s*)$""".r
+    regex.findFirstIn(gitterMessage.text).isEmpty
+  }
+
+}
+
 class Twitter (
   consumerKey: String,
   consumerSecret: String,
