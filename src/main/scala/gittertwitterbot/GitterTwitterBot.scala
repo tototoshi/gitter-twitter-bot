@@ -57,9 +57,10 @@ object GitterTwitterBot extends LazyLogging with Using {
             for {
               line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
               gitterMessage <- parseStreamLine(line)
-              if Twitter.isAllowedToTweet(gitterMessage)
             } {
-              twitter.tweet(gitterMessage, gist)
+              if (Twitter.isAllowedToTweet(gitterMessage)) {
+                twitter.tweet(gitterMessage, gist)
+              }
               if (gitterMessage.text.startsWith(scalaBotId)) {
                 Future {
                   ScalaEval(gitterMessage.text.drop(scalaBotId.length)).foreach { result =>
