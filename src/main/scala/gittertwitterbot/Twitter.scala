@@ -11,12 +11,11 @@ object Twitter {
 
 }
 
-class Twitter (
-  consumerKey: String,
-  consumerSecret: String,
-  accessToken: String,
-  accessTokenSecret: String
-) extends LazyLogging {
+class Twitter(
+    consumerKey: String,
+    consumerSecret: String,
+    accessToken: String,
+    accessTokenSecret: String) extends LazyLogging {
 
   import twitter4j._
   import twitter4j.conf._

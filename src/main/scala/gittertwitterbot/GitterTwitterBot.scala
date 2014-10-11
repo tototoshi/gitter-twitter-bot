@@ -1,7 +1,7 @@
 package gittertwitterbot
 
 import com.typesafe.scalalogging.LazyLogging
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object GitterTwitterBot extends LazyLogging with Using {
 
@@ -52,25 +52,25 @@ object GitterTwitterBot extends LazyLogging with Using {
       .option(HttpOptions.connTimeout(connectionTimeout))
       .option(HttpOptions.readTimeout(readTimeout)) { inputStream =>
 
-      using(new InputStreamReader(inputStream)) { ir =>
-        using (new BufferedReader(ir)) { br =>
-          for {
-            line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
-            gitterMessage <- parseStreamLine(line)
-            if Twitter.isAllowedToTweet(gitterMessage)
-          } {
-            twitter.tweet(gitterMessage, gist)
-            if(gitterMessage.text.startsWith(scalaBotId)){
-              Future{
-                ScalaEval(gitterMessage.text.drop(scalaBotId.length)).foreach{ result =>
-                  gitter.postMessage("```\n" + result + "\n```")
-                }
-              }(ExecutionContext.global)
+        using(new InputStreamReader(inputStream)) { ir =>
+          using(new BufferedReader(ir)) { br =>
+            for {
+              line <- Iterator.continually(br.readLine()).takeWhile(_ != null)
+              gitterMessage <- parseStreamLine(line)
+              if Twitter.isAllowedToTweet(gitterMessage)
+            } {
+              twitter.tweet(gitterMessage, gist)
+              if (gitterMessage.text.startsWith(scalaBotId)) {
+                Future {
+                  ScalaEval(gitterMessage.text.drop(scalaBotId.length)).foreach { result =>
+                    gitter.postMessage("```\n" + result + "\n```")
+                  }
+                }(ExecutionContext.global)
+              }
             }
           }
         }
       }
-    }
   }
 
 }

@@ -2,6 +2,8 @@ import AssemblyKeys._
 
 assemblySettings
 
+scalariformSettings
+
 name := """gitter-twitter-bot"""
 
 version := "1.0"

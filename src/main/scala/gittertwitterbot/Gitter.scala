@@ -2,7 +2,7 @@ package gittertwitterbot
 
 import com.typesafe.scalalogging.StrictLogging
 
-final class Gitter(gitterRoomId: String, gitterToken: String) extends StrictLogging{
+final class Gitter(gitterRoomId: String, gitterToken: String) extends StrictLogging {
 
   def postMessage(text: String): Unit = {
     import scalaj.http.Http
