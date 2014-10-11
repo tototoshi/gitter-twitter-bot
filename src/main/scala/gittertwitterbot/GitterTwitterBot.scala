@@ -1,6 +1,7 @@
 package gittertwitterbot
 
 import com.typesafe.scalalogging.LazyLogging
+import scala.concurrent.{ExecutionContext, Future}
 
 object GitterTwitterBot extends LazyLogging with Using {
 
@@ -10,6 +11,7 @@ object GitterTwitterBot extends LazyLogging with Using {
   private val config = ConfigFactory.load()
 
   private val gitterRoomId = config.get[String]("gitter.roomId")
+  private val scalaBotId = "@" + config.get[String]("scalaBotId")
   private val gitterToken = config.get[String]("gitter.token")
   private val gistToken = config.get[String]("github.token")
   private val twitterConsumerKey = config.get[String]("twitter.consumerKey")
@@ -23,6 +25,8 @@ object GitterTwitterBot extends LazyLogging with Using {
     twitterAccessToken,
     twitterAccessTokenSecret
   )
+
+  private val gitter = new Gitter(gitterRoomId, gitterToken)
 
   private def parseStreamLine(line: String): Option[GitterMessage] = {
     import org.json4s._
@@ -56,6 +60,13 @@ object GitterTwitterBot extends LazyLogging with Using {
             if Twitter.isAllowedToTweet(gitterMessage)
           } {
             twitter.tweet(gitterMessage, gist)
+            if(gitterMessage.text.startsWith(scalaBotId)){
+              Future{
+                ScalaEval(gitterMessage.text.drop(scalaBotId.length)).foreach{ result =>
+                  gitter.postMessage("```\n" + result + "\n```")
+                }
+              }(ExecutionContext.global)
+            }
           }
         }
       }
