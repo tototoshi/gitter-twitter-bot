@@ -4,8 +4,24 @@ import com.typesafe.scalalogging.LazyLogging
 
 object Twitter {
 
+  /**
+   * Check a gitter message is allowed to tweet.
+   *
+   * {{{
+   * >>> import Twitter._
+   * >>> val user = GitterUser("user")
+   * >>> isAllowedToTweet(GitterMessage(user, "Hello, world!"))
+   * true
+   *
+   * >>> isAllowedToTweet(GitterMessage(user, "Hello, world! > /dev/null"))
+   * false
+   *
+   * >>> isAllowedToTweet(GitterMessage(user, "Hello,\n world! > /dev/null"))
+   * false
+   * }}}
+   */
   def isAllowedToTweet(gitterMessage: GitterMessage): Boolean = {
-    val regex = """^.*?(>\s*/dev/null\s*)$""".r
+    val regex = """(?m)^.*?(>\s*/dev/null\s*)$""".r
     regex.findFirstIn(gitterMessage.text).isEmpty
   }
 
