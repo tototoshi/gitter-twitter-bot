@@ -51,7 +51,7 @@ class Twitter(
     text.replace("@", ">")
 
   def tweet(gitterMessage: GitterMessage, gist: Gist): Unit = {
-    val message = escapeAtmark(gitterMessage.fromUser.username + ":\n" + gitterMessage.text)
+    val message = Emoji.replace(escapeAtmark(gitterMessage.fromUser.username + ":\n" + gitterMessage.text))
     logger.info(message)
     try {
       if (message.size > 140) {
