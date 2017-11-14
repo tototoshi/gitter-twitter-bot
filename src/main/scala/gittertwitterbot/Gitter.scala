@@ -15,17 +15,17 @@ final class Gitter(gitterRoomId: String, gitterToken: String) extends StrictLogg
 
     val data = Extraction.decompose(Map("text" -> text))
 
-    val (responseCode, headersMap, resultString) =
-      Http
-        .postData(s"https://api.gitter.im/v1/rooms/${gitterRoomId}/chatMessages", compact(render(data)).getBytes)
+    val response =
+      Http(s"https://api.gitter.im/v1/rooms/${gitterRoomId}/chatMessages")
+        .postData(compact(render(data)).getBytes)
         .header("Content-Type", "application/json")
         .header("Accept", "application/json")
         .header("Authorization", s"Bearer $gitterToken")
         .option(HttpOptions.connTimeout(10 * 1000))
-        .asHeadersAndParse(Http.readString)
+        .asString
 
-    if (responseCode != 200) {
-      logger.error(resultString)
+    if (response.code != 200) {
+      logger.error(response.body)
     }
   }
 

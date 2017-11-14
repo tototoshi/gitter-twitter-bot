@@ -7,13 +7,13 @@ import scalaj.http.{ HttpOptions, Http }
 object ScalaEval extends StrictLogging {
 
   def apply(code: String): Option[String] = {
-    val request = Http
-      .postData("http://scala-eval.herokuapp.com", code.getBytes("UTF-8"))
+    val request = Http("http://scala-eval.herokuapp.com")
+      .postData(code.getBytes("UTF-8"))
       .header("Content-type", "text/plain; charset=UTF-8")
       .option(HttpOptions.connTimeout(30 * 1000))
       .option(HttpOptions.readTimeout(30 * 1000))
     try {
-      Option(request.asString)
+      Option(request.asString.body)
     } catch {
       case NonFatal(e) =>
         logger.warn("scala-eval error", e)
