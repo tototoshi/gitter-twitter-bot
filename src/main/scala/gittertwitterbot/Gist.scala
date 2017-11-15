@@ -21,12 +21,13 @@ class Gist(token: String) extends LazyLogging {
 
     val data = compact(render(Extraction.decompose(payload)))
 
-    val body = Http
-      .postData("https://api.github.com/gists", data.getBytes)
+    val body = Http("https://api.github.com/gists")
+      .postData(data.getBytes)
       .header("Authorization", s"token $token")
       .option(HttpOptions.connTimeout(10 * 1000))
       .option(HttpOptions.readTimeout(10 * 1000))
       .asString
+      .body
 
     logger.info(body)
 
