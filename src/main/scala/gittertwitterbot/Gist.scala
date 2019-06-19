@@ -7,11 +7,9 @@ case class GistPostResponse(html_url: String)
 class Gist(token: String) extends LazyLogging {
 
   def post(text: String): String = {
-    import scalaj.http.Http
-    import scalaj.http.HttpOptions
-
     import org.json4s._
     import org.json4s.native.JsonMethods._
+    import scalaj.http.{ Http, HttpOptions }
 
     implicit val formats = DefaultFormats
 
@@ -21,12 +19,14 @@ class Gist(token: String) extends LazyLogging {
 
     val data = compact(render(Extraction.decompose(payload)))
 
-    val body = Http
-      .postData("https://api.github.com/gists", data.getBytes)
+    val response = Http("https://api.github.com/gists")
+      .postData(data.getBytes)
       .header("Authorization", s"token $token")
       .option(HttpOptions.connTimeout(10 * 1000))
       .option(HttpOptions.readTimeout(10 * 1000))
       .asString
+
+    val body = response.body
 
     logger.info(body)
 

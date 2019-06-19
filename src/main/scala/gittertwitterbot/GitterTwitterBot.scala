@@ -5,19 +5,19 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 object GitterTwitterBot extends LazyLogging with Using {
 
-  import com.github.kxbmap.configs._
+  import configs.syntax._
   import com.typesafe.config.ConfigFactory
 
   private val config = ConfigFactory.load()
 
-  private val gitterRoomId = config.get[String]("gitter.roomId")
-  private val scalaBotId = "@" + config.get[String]("scalaBotId")
-  private val gitterToken = config.get[String]("gitter.token")
-  private val gistToken = config.get[String]("github.token")
-  private val twitterConsumerKey = config.get[String]("twitter.consumerKey")
-  private val twitterConsumerSecret = config.get[String]("twitter.consumerSecret")
-  private val twitterAccessToken = config.get[String]("twitter.accessToken")
-  private val twitterAccessTokenSecret = config.get[String]("twitter.accessTokenSecret")
+  private val gitterRoomId = config.get[String]("gitter.roomId").value
+  private val scalaBotId = "@" + config.get[String]("scalaBotId").value
+  private val gitterToken = config.get[String]("gitter.token").value
+  private val gistToken = config.get[String]("github.token").value
+  private val twitterConsumerKey = config.get[String]("twitter.consumerKey").value
+  private val twitterConsumerSecret = config.get[String]("twitter.consumerSecret").value
+  private val twitterAccessToken = config.get[String]("twitter.accessToken").value
+  private val twitterAccessTokenSecret = config.get[String]("twitter.accessTokenSecret").value
 
   private val twitter = new Twitter(
     twitterConsumerKey,
@@ -50,7 +50,7 @@ object GitterTwitterBot extends LazyLogging with Using {
       .header("Accept", "application/json")
       .header("Authorization", s"Bearer $gitterToken")
       .option(HttpOptions.connTimeout(connectionTimeout))
-      .option(HttpOptions.readTimeout(readTimeout)) { inputStream =>
+      .option(HttpOptions.readTimeout(readTimeout)).execute { inputStream =>
 
         using(new InputStreamReader(inputStream)) { ir =>
           using(new BufferedReader(ir)) { br =>
