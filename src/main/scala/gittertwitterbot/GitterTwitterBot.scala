@@ -46,6 +46,8 @@ object GitterTwitterBot extends LazyLogging with Using {
 
     val gist = new Gist(gistToken)
 
+    logger.info("Start gitter-twitter-bot")
+
     Http(url)
       .header("Accept", "application/json")
       .header("Authorization", s"Bearer $gitterToken")
