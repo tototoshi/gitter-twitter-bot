@@ -1,8 +1,11 @@
-import AssemblyKeys._
+import scalariform.formatter.preferences._
 
-assemblySettings
+mainClass in assembly := Some("gittertwitterbot.GitterTwitterBot")
 
-scalariformSettings
+scalariformPreferences := scalariformPreferences.value
+  .setPreference(AlignSingleLineCaseStatements, true)
+  .setPreference(DoubleIndentConstructorArguments, true)
+  .setPreference(DanglingCloseParenthesis, Preserve)
 
 name := """gitter-twitter-bot"""
 
@@ -20,4 +23,4 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.2"
 )
 
-doctestSettings
+doctestTestFramework := DoctestTestFramework.ScalaTest
