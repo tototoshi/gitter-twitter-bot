@@ -1,0 +1,6 @@
+language: scala
+jdk: oraclejdk8
+sudo: false
+script:
+- sbt test
+- git diff --exit-code # check scalariform
